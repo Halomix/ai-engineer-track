@@ -1,5 +1,6 @@
 # AI Engineer Track
 
+[![CI](https://github.com/Halomix/ai-engineer-track/actions/workflows/ci.yml/badge.svg)](https://github.com/Halomix/ai-engineer-track/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/github/license/Halomix/ai-engineer-track)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/)
 [![Last commit](https://img.shields.io/github/last-commit/Halomix/ai-engineer-track)](https://github.com/Halomix/ai-engineer-track/commits/master)
@@ -72,7 +73,7 @@ become very slow.
 | Phase | Weeks | Status | Shipped |
 |---|---|---|---|
 | 0 — Environment | — | ✅ done | Local models, Postgres+pgvector, health check |
-| 1 — Engineering foundations | 1–3 | 🔧 in progress | Notes API validated & tested (wk 1) · real Postgres storage, migrations, a measured 12× index speedup (wk 2) |
+| 1 — Engineering foundations | 1–3 | ✅ done | Notes API validated & tested (wk 1) · real Postgres storage, migrations, a measured 12× index speedup (wk 2) · CI running on every push (wk 3) |
 | 2 — LLM API fundamentals | 4–6 | ⬜ not started | |
 | 3 — Retrieval / RAG | 7–11 | ⬜ not started | |
 | 4 — Evaluation | 12–14 | ⬜ not started | |
