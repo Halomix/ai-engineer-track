@@ -1,0 +1,36 @@
+# Runs a Postgres database on your machine inside a container.
+# A container is a sealed box holding the database and everything it needs —
+# so you don't install Postgres on Windows directly, and deleting it is clean.
+#
+# Start it:  docker compose up -d
+# Stop it:   docker compose down
+# Wipe it:   docker compose down -v   (deletes the data too)
+
+services:
+  db:
+    # This image is Postgres 16 with the "pgvector" add-on already built in.
+    # pgvector lets the database store and search the number-lists that
+    # represent meaning. You'll use it heavily from week 7.
+    image: pgvector/pgvector:pg16
+    container_name: course-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: course
+      POSTGRES_PASSWORD: localdev
+      POSTGRES_DB: coursedb
+    ports:
+      # left side = port on your Windows machine, right side = inside the box
+      - "5432:5432"
+    volumes:
+      # Keeps the data on disk so it survives a restart
+      - course_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # Docker uses this to know when the database is actually ready,
+      # not just started. Saves you from confusing "connection refused" errors.
+      test: ["CMD-SHELL", "pg_isready -U course -d coursedb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  course_pgdata:
