@@ -1,0 +1,64 @@
+# Runs on GitHub's own servers, on a fresh machine, every time code is
+# pushed. Nothing here is assumed to already exist — everything the job
+# needs (Python, dependencies, even the database) is set up from scratch,
+# then thrown away when the run ends.
+
+name: CI
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    # A temporary Postgres, alive only for this run — same image and
+    # credentials as docker-compose.yml, so nothing behaves differently
+    # here than it does on your own machine.
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: course
+          POSTGRES_PASSWORD: localdev
+          POSTGRES_DB: coursedb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U course -d coursedb"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      # Same "+psycopg" fix from Phase 1, week 2 — without it SQLAlchemy
+      # reaches for a driver that was never installed.
+      DATABASE_URL: postgresql+psycopg://course:localdev@localhost:5432/coursedb
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@v10
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Lint (ruff)
+        run: uv run ruff check .
+
+      - name: Type check (mypy)
+        run: uv run mypy phase-1/week-1/notes_service
+
+      - name: Apply database migrations
+        working-directory: phase-1/week-1
+        run: uv run alembic upgrade head
+
+      - name: Run tests
+        run: uv run pytest phase-1/week-1/tests -v
